@@ -32,27 +32,16 @@ func expandCidr(prefix string) ([]string, error) {
 	return iplist, err
 }
 
-func checkCidrAddress(verbose bool, singleip string, prefix string, wg * sync.WaitGroup)  {
+func checkCidrAddress(verbose bool, singleip string, iplist []string, wg * sync.WaitGroup)  {
 	defer wg.Done()
 	
-	iplist, err := expandCidr(prefix)
-	if verbose == true {
-		fmt.Printf("[*] Checking pair: %s and %s\n",singleip,prefix)
-		fmt.Printf("[*] Prefix %s contains %d addresses\n",prefix,len(iplist))
-	}
-	if err == nil {
-		for _, ipp := range iplist {
-			if ipp == singleip {
-				fmt.Println(singleip)
-				break
-			}
-		}
-	} else {
-		if verbose == true {
-			fmt.Printf("[*] Error expanding prefix %s:\n%s\n",prefix,err)	
+	//iplist, err := expandCidr(prefix)
+	for _, ipp := range iplist {
+		if ipp == singleip {
+			fmt.Println(singleip)
+			break
 		}
 	}
-	
 }
 
 func main() {
@@ -80,8 +69,12 @@ func main() {
 	for _, prefix := range listofprefixes {
 		for _, ipaddr := range listoftargetips {
 			if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0]{
-				wg.Add(1)
-				go checkCidrAddress(options.Verbose,ipaddr,prefix,&wg)
+				iplist, err := expandCidr(prefix)
+				if err == nil {
+					fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
+					wg.Add(1)
+					go checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
+				} 
 			}
 		}
 	}
