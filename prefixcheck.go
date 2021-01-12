@@ -52,11 +52,13 @@ func checkCidrAddress(verbose bool, singleip string, prefix string, wg * sync.Wa
 			fmt.Printf("[*] Error expanding prefix %s:\n%s\n",prefix,err)	
 		}
 	}
+	
 }
 
 func main() {
 	options := parseOptions()
 	var wg sync.WaitGroup
+
 	if options.Verbose == true{
 		fmt.Println("PrefixCheck is running")
 	}
@@ -64,7 +66,7 @@ func main() {
 	prefixfilestream, _ := ioutil.ReadFile(options.PrefixFile)
 	prefixcontent := string(prefixfilestream)
 	listofprefixes := strings.Split(prefixcontent, "\n")
-	if options.Verbose == true{
+	if options.Verbose == true {
 		fmt.Printf("[*] Prefixes loaded: %d \n",len(listofprefixes))
 	}
 	
@@ -74,7 +76,7 @@ func main() {
 	if options.Verbose == true{
 		fmt.Printf("[*] Target ip address loaded: %d \n",len(targetfilecontent))
 	}
-		
+	
 	for _, prefix := range listofprefixes {
 		for _, ipaddr := range listoftargetips {
 			if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0]{
@@ -83,6 +85,8 @@ func main() {
 			}
 		}
 	}
+	
+
 	wg.Wait()
 }
 
