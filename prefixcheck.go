@@ -2,48 +2,81 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"bufio"
 	"strings"
 	"io/ioutil"
 	"sync"
+	"flag"
 	"github.com/projectdiscovery/mapcidr"
 )
 
-func check(singleip string, prefix string, wg * sync.WaitGroup)  {
+const banner = `
+____            __ _       ____ _               _    
+|  _ \ _ __ ___ / _(_)_  __/ ___| |__   ___  ___| | __
+| |_) | '__/ _ \ |_| \ \/ / |   | '_ \ / _ \/ __| |/ /
+|  __/| | |  __/  _| |>  <| |___| | | |  __/ (__|   < 
+|_|   |_|  \___|_| |_/_/\_\\____|_| |_|\___|\___|_|\_\
+======================================================
+`
+const Version = `0.2`
+
+type Options struct {
+	PrefixFile			string
+	TargetFile			string
+}
+
+
+func showBanner() {
+	fmt.Printf("%s", banner)
+	fmt.Printf("\t\t\t\t\t\t\t\tversion: %s\n\n",Version)
+}
+
+
+func parseOptions() *Options {
+	options := &Options{}
+	flag.StringVar(&options.PrefixFile, 		"p", "", "File containing the list of cidr prefixes related to the target")
+	flag.StringVar(&options.TargetFile, 		"t", "", "List of single ip addresses that will be checked against those cidr prefixes")
+	flag.Parse()
+
+	showBanner()
+	return options
+}
+
+func expandCidr(prefix string) ([]string, error) {
+	iplist, err := mapcidr.IPAddresses(prefix)
+	return iplist, err
+}
+
+func checkCidrAddress(singleip string, prefix string, wg * sync.WaitGroup)  {
 	defer wg.Done()
-	iplist, _ := mapcidr.IPAddresses(prefix)
-	for _, ipp := range iplist {
-		if ipp == singleip {
-			fmt.Println(singleip)
-			break
+	iplist, err := expandCidr(prefix)
+	if err == nil {
+		for _, ipp := range iplist {
+			if ipp == singleip {
+				fmt.Println(singleip)
+				break
+			}
 		}
 	}
 }
 
 func main() {
-
-	if len(os.Args[1:]) == 0 {
-		fmt.Printf("%s <prefix file> <list of ips>\n", os.Args[0] )
-		fmt.Println("<prefix file> - a list of cidr taken from ASN that you want to use as base search")
-		fmt.Println("<list of ips> - a list of ips taken from massdns or any other discovery method that you want to check if it belongs to those ASN prefixes")
-		return 
-	}
+	options := parseOptions()
 	var wg sync.WaitGroup
 
-	pf, _ := os.Open(os.Args[1])
-	defer pf.Close()
-	prefixo := bufio.NewScanner(pf)
 
-	bytesRead, _ := ioutil.ReadFile(os.Args[2])
-	file_content := string(bytesRead)
-    lines := strings.Split(file_content, "\n")
+	prefixfilestream, _ := ioutil.ReadFile(options.PrefixFile)
+	prefixcontent := string(prefixfilestream)
+	listofprefixes := strings.Split(prefixcontent, "\n")
+	
+	targetfilestream, _ := ioutil.ReadFile(options.TargetFile)
+	targetfilecontent := string(targetfilestream)
+    listoftargetips := strings.Split(targetfilecontent, "\n")
 		
-	for prefixo.Scan() {
-		for _, singleip := range lines {
-			if strings.Split(singleip, ".")[0] == strings.Split(prefixo.Text(), ".")[0]{
+	for _, prefix := range listofprefixes {
+		for _, ipaddr := range listoftargetips {
+			if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0]{
 				wg.Add(1)
-				go check(singleip,prefixo.Text(),&wg)
+				go checkCidrAddress(ipaddr,prefix,&wg)
 			}
 		}
 	}
