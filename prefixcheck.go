@@ -74,7 +74,9 @@ func main() {
 			if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0]{
 				iplist, err := expandCidr(prefix)
 				if err == nil {
-					fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
+					if options.Verbose == true{
+						fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
+					}
 					wg.Add(1)
 					go checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
 				} 
