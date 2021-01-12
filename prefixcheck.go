@@ -55,6 +55,7 @@ func main() {
 	prefixfilestream, _ := ioutil.ReadFile(options.PrefixFile)
 	prefixcontent := string(prefixfilestream)
 	listofprefixes := strings.Split(prefixcontent, "\n")
+
 	if options.Verbose == true {
 		fmt.Printf("[*] Prefixes loaded: %d \n",len(listofprefixes))
 	}
@@ -62,9 +63,11 @@ func main() {
 	targetfilestream, _ := ioutil.ReadFile(options.TargetFile)
 	targetfilecontent := string(targetfilestream)
 	listoftargetips := strings.Split(targetfilecontent, "\n")
+
 	if options.Verbose == true{
 		fmt.Printf("[*] Target ip address loaded: %d \n",len(targetfilecontent))
 	}
+	
 	
 	for _, prefix := range listofprefixes {
 		for _, ipaddr := range listoftargetips {
