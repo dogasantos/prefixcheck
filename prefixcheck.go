@@ -21,7 +21,7 @@ func parseOptions() *Options {
 	options := &Options{}
 	flag.StringVar(&options.PrefixFile, 		"p", "", "File containing the list of cidr prefixes related to the target")
 	flag.StringVar(&options.TargetFile, 		"t", "", "List of single ip addresses that will be checked against those cidr prefixes")
-	flag.StringVar(&options.Verbose, 			"v", "", "Verbose mode for debug purposes")
+	flag.BoolVar(&options.Verbose, 			"v", "", "Verbose mode for debug purposes")
 
 	flag.Parse()
 	return options
