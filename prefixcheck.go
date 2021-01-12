@@ -9,35 +9,21 @@ import (
 	"github.com/projectdiscovery/mapcidr"
 )
 
-const banner = `
-____            __ _       ____ _               _    
-|  _ \ _ __ ___ / _(_)_  __/ ___| |__   ___  ___| | __
-| |_) | '__/ _ \ |_| \ \/ / |   | '_ \ / _ \/ __| |/ /
-|  __/| | |  __/  _| |>  <| |___| | | |  __/ (__|   < 
-|_|   |_|  \___|_| |_/_/\_\\____|_| |_|\___|\___|_|\_\
-======================================================
-`
-const Version = `0.2`
-
 type Options struct {
 	PrefixFile			string
 	TargetFile			string
+	Verbose				bool
 }
 
-
-func showBanner() {
-	fmt.Printf("%s", banner)
-	fmt.Printf("\t\t\t\t\t\t\t\tversion: %s\n\n",Version)
-}
 
 
 func parseOptions() *Options {
 	options := &Options{}
 	flag.StringVar(&options.PrefixFile, 		"p", "", "File containing the list of cidr prefixes related to the target")
 	flag.StringVar(&options.TargetFile, 		"t", "", "List of single ip addresses that will be checked against those cidr prefixes")
-	flag.Parse()
+	flag.StringVar(&options.Verbose, 			"v", "", "Verbose mode for debug purposes")
 
-	showBanner()
+	flag.Parse()
 	return options
 }
 
@@ -46,9 +32,14 @@ func expandCidr(prefix string) ([]string, error) {
 	return iplist, err
 }
 
-func checkCidrAddress(singleip string, prefix string, wg * sync.WaitGroup)  {
+func checkCidrAddress(verbose bool, singleip string, prefix string, wg * sync.WaitGroup)  {
 	defer wg.Done()
+	
 	iplist, err := expandCidr(prefix)
+	if verbose == True {
+		fmt.Printf("[*] Checking pair: %s and %s\n",singleip,prefix)
+		fmt.Printf("[*] Prefix %s contains %d addresses\n",prefix,len(iplist))
+	}
 	if err == nil {
 		for _, ipp := range iplist {
 			if ipp == singleip {
@@ -56,27 +47,39 @@ func checkCidrAddress(singleip string, prefix string, wg * sync.WaitGroup)  {
 				break
 			}
 		}
+	} else {
+		if verbose == True {
+			fmt.Printf("[*] Error expanding prefix %s:\n%s\n",prefix,err)	
+		}
 	}
 }
 
 func main() {
 	options := parseOptions()
 	var wg sync.WaitGroup
-
+	if options.Verbose == True{
+		fmt.Println("PrefixCheck is running")
+	}
 
 	prefixfilestream, _ := ioutil.ReadFile(options.PrefixFile)
 	prefixcontent := string(prefixfilestream)
 	listofprefixes := strings.Split(prefixcontent, "\n")
+	if options.Verbose == True{
+		fmt.Printf("[*] Prefixes loaded: %d \n",len(listofprefixes))
+	}
 	
 	targetfilestream, _ := ioutil.ReadFile(options.TargetFile)
 	targetfilecontent := string(targetfilestream)
-    listoftargetips := strings.Split(targetfilecontent, "\n")
+	listoftargetips := strings.Split(targetfilecontent, "\n")
+	if options.Verbose == True{
+		fmt.Printf("[*] Target ip address loaded: %d \n",len(targetfilecontent))
+	}
 		
 	for _, prefix := range listofprefixes {
 		for _, ipaddr := range listoftargetips {
 			if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0]{
 				wg.Add(1)
-				go checkCidrAddress(ipaddr,prefix,&wg)
+				go checkCidrAddress(options.Verbose,ipaddr,prefix,&wg)
 			}
 		}
 	}
