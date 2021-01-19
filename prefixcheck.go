@@ -55,7 +55,6 @@ func checkCidrAddress(verbose bool, singleip string, iplist []string, wg * sync.
 func main() {
 	options := parseOptions()
 	var wg sync.WaitGroup
-	var processed []string 
 
 	if options.Verbose == true{
 		fmt.Println("PrefixCheck is running")
@@ -87,12 +86,8 @@ func main() {
 					if options.Verbose == true{
 						fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
 					}
-					if sliceContainsElement(processed, ipaddr) == false {
-						processed = append(processed, ipaddr)
-						wg.Add(1)
-						go checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
-					
-					}
+					wg.Add(1)
+					go checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
 				} 
 			}
 		}
