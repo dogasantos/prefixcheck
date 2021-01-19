@@ -15,6 +15,16 @@ type Options struct {
 	Verbose				bool
 }
 
+func sliceContainsElement(slice []string, element string) bool {
+	retval := false
+	for _, e := range slice {
+		if e == element {
+			retval = true
+		}
+	}
+	return retval
+}
+
 
 
 func parseOptions() *Options {
@@ -34,8 +44,6 @@ func expandCidr(prefix string) ([]string, error) {
 
 func checkCidrAddress(verbose bool, singleip string, iplist []string, wg * sync.WaitGroup)  {
 	defer wg.Done()
-	
-	//iplist, err := expandCidr(prefix)
 	for _, ipp := range iplist {
 		if ipp == singleip {
 			fmt.Println(singleip)
@@ -47,6 +55,7 @@ func checkCidrAddress(verbose bool, singleip string, iplist []string, wg * sync.
 func main() {
 	options := parseOptions()
 	var wg sync.WaitGroup
+	var processed []string 
 
 	if options.Verbose == true{
 		fmt.Println("PrefixCheck is running")
@@ -71,14 +80,19 @@ func main() {
 	
 	for _, prefix := range listofprefixes {
 		for _, ipaddr := range listoftargetips {
-			if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0]{
+			
+			if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
 				iplist, err := expandCidr(prefix)
 				if err == nil {
 					if options.Verbose == true{
 						fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
 					}
-					wg.Add(1)
-					go checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
+					if sliceContainsElement(processed, ipaddr) == false {
+						processed = append(processed, ipaddr)
+						wg.Add(1)
+						go checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
+					
+					}
 				} 
 			}
 		}
