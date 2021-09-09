@@ -103,13 +103,15 @@ func main() {
 			if ipv4.IsLoopback() {
 				fmt.Printf("%s:loopback\n",options.IpAddress)
 			} else {
-				if ipv4.IsPrivate() {
-					fmt.Printf("%s:private\n",options.IpAddress)
-				} else {
-					fmt.Printf("%s:public\n",options.IpAddress)
-				}
 				if ipv4.IsReserved() {
 					fmt.Printf("%s:reserved\n",options.IpAddress)
+				} else {
+
+					if ipv4.IsPrivate() {
+						fmt.Printf("%s:private\n",options.IpAddress)
+					} else {
+						fmt.Printf("%s:public\n",options.IpAddress)
+					}
 				}
 			}
 			
