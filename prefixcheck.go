@@ -96,21 +96,23 @@ func main() {
 
 		wg.Wait()
 	} 
-	
+
 	if options.IpAddress != "" {
 		ipv4 := netaddr.MustNewIPAddress(options.IpAddress)
 		if ipv4.IsIPv4() {
 			if ipv4.IsLoopback() {
 				fmt.Printf("%s:loopback\n",options.IpAddress)
-			}
-			if ipv4.IsPrivate() {
-				fmt.Printf("%s:private\n",options.IpAddress)
 			} else {
-				fmt.Printf("%s:public\n",options.IpAddress)
+				if ipv4.IsPrivate() {
+					fmt.Printf("%s:private\n",options.IpAddress)
+				} else {
+					fmt.Printf("%s:public\n",options.IpAddress)
+				}
+				if ipv4.IsReserved() {
+					fmt.Printf("%s:reserved\n",options.IpAddress)
+				}
 			}
-			if ipv4.IsReserved() {
-				fmt.Printf("%s:reserved\n",options.IpAddress)
-			}
+			
 		} else {
 			fmt.Printf("%s:invalid\n",options.IpAddress)
 		}
