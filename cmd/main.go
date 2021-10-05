@@ -6,9 +6,14 @@ import (
 	"io/ioutil"
 	"strings"
 	"sync"
-	"github.com/dogasantos/prefixcheck/pkg/runner"
-	"github.com/dogasantos/prefixcheck/pkg/options"
 )
+
+type Options struct {
+	PrefixFile			string
+	TargetFile			string
+	IpAddress			string
+	Verbose				bool
+}
 
 func parseOptions() *Options {
 	options := &Options{}
@@ -45,7 +50,7 @@ func main() {
 		
 		for _, prefix := range listofprefixes {
 			wg.Add(1)
-			go prefixcheck.checklist(listoftargetips,prefix,wg, options)
+			go prefixcheck.checklist(listoftargetips,prefix,wg, options.Verbose)
 
 		}
 		wg.Wait()

@@ -17,3 +17,4 @@ prefixcheck
 
 *.mod
 *.sum
+prefixcheck.go
