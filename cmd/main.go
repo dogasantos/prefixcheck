@@ -7,14 +7,15 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/dogasantos/prefixcheck/pkg/runner"
 	"github.com/xgfone/netaddr"
+	"github.com/dogasantos/prefixcheck/pkg/runner"
 )
 
 type Options struct {
 	PrefixFile			string
 	TargetFile			string
 	IpAddress			string
+	Version				bool
 	Verbose				bool
 }
 
@@ -23,6 +24,7 @@ func parseOptions() *Options {
 	flag.StringVar(&options.PrefixFile, 		"p", "", "File containing the list of cidr prefixes related to the target")
 	flag.StringVar(&options.TargetFile, 		"t", "", "List of single ip addresses that will be checked against those cidr prefixes")
 	flag.StringVar(&options.IpAddress, 			"r", "", "Check if provided ip address is reserved/private or public (v4)")
+	flag.BoolVar(&options.Version, 				"i", false, "Version info")
 	flag.BoolVar(&options.Verbose, 				"v", false, "Verbose mode for debug purposes")
 
 	flag.Parse()
@@ -31,6 +33,9 @@ func parseOptions() *Options {
 
 func main() {
 	options := parseOptions()
+	if options.Version {
+		fmt.Println("v0.2")
+	}
 	var wg sync.WaitGroup
 
 	if options.PrefixFile != "" {
