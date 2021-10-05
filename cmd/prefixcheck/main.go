@@ -32,11 +32,13 @@ func parseOptions() *Options {
 }
 
 func main() {
+	var wg sync.WaitGroup
+	
 	options := parseOptions()
 	if options.Version {
 		fmt.Println("v0.2")
 	}
-	var wg sync.WaitGroup
+	
 
 	if options.PrefixFile != "" {
 
