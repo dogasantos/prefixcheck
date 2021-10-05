@@ -1,13 +1,25 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"strings"
 	"sync"
-	"github.com/dogasantos/prefixcheck"
+	"github.com/dogasantos/prefixcheck/pkg/runner"
+	"github.com/dogasantos/prefixcheck/pkg/options"
 )
 
+func parseOptions() *Options {
+	options := &Options{}
+	flag.StringVar(&options.PrefixFile, 		"p", "", "File containing the list of cidr prefixes related to the target")
+	flag.StringVar(&options.TargetFile, 		"t", "", "List of single ip addresses that will be checked against those cidr prefixes")
+	flag.StringVar(&options.IpAddress, 			"r", "", "Check if provided ip address is reserved/private or public (v4)")
+	flag.BoolVar(&options.Verbose, 				"v", false, "Verbose mode for debug purposes")
+
+	flag.Parse()
+	return options
+}
 
 func main() {
 	options := parseOptions()
