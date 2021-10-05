@@ -33,7 +33,7 @@ func parseOptions() *Options {
 
 func main() {
 	var wg sync.WaitGroup
-
+	var count = 0 
 	options := parseOptions()
 	if options.Version {
 		fmt.Println("v0.2")
@@ -58,8 +58,10 @@ func main() {
 		}
 		
 		for _, prefix := range listofprefixes {
-			wg.Add(1)
-			go prefixcheck.Checklist(listoftargetips,prefix,wg, options.Verbose)
+			count += 1
+			fmt.Printf("%d:%s\n",count,prefix)
+			wg.Add(count)
+			go prefixcheck.Checklist(listoftargetips, prefix, wg, options.Verbose)
 		}
 		wg.Wait()
 	} 
