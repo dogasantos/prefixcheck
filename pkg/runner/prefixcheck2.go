@@ -35,7 +35,7 @@ func checkCidrAddress(verbose bool, singleip string, iplist []string, wg * sync.
 	}
 }
 
-func checklist(listoftargetips []string,prefix string, wg sync.WaitGroup, verbose bool) { 
+func Checklist(listoftargetips []string,prefix string, wg sync.WaitGroup, verbose bool) { 
 	defer wg.Done()
 	for _, ipaddr := range listoftargetips {
 		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {

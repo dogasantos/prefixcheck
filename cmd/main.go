@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"strings"
 	"sync"
+
 	"github.com/dogasantos/prefixcheck/pkg/runner"
+	"github.com/xgfone/netaddr"
 )
 
 type Options struct {
@@ -51,7 +53,7 @@ func main() {
 		
 		for _, prefix := range listofprefixes {
 			wg.Add(1)
-			go prefixcheck.checklist(listoftargetips,prefix,wg, options.Verbose)
+			go prefixcheck.Checklist(listoftargetips,prefix,wg, options.Verbose)
 
 		}
 		wg.Wait()
