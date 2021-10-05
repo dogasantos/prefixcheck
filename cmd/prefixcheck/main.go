@@ -33,13 +33,12 @@ func parseOptions() *Options {
 
 func main() {
 	var wg sync.WaitGroup
-	
+
 	options := parseOptions()
 	if options.Version {
 		fmt.Println("v0.2")
 	}
 	
-
 	if options.PrefixFile != "" {
 
 		prefixfilestream, _ := ioutil.ReadFile(options.PrefixFile)
@@ -55,7 +54,7 @@ func main() {
 		listoftargetips := strings.Split(targetfilecontent, "\n")
 
 		if options.Verbose == true{
-			fmt.Printf("[*] Target ip address loaded: %d \n",len(targetfilecontent))
+			fmt.Printf("[*] Target ip address loaded: %d \n",len(listoftargetips))
 		}
 		
 		for _, prefix := range listofprefixes {
