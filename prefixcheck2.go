@@ -47,11 +47,32 @@ func expandCidr(prefix string) ([]string, error) {
 }
 
 func checkCidrAddress(verbose bool, singleip string, iplist []string, wg * sync.WaitGroup)  {
-	defer wg.Done()
 	for _, ipp := range iplist {
 		if ipp == singleip {
 			fmt.Println(singleip)
 			break
+		}
+	}
+}
+
+func checklist(listoftargetips []string,prefix string, wg sync.WaitGroup, options *Options) { 
+	defer wg.Done()
+	for _, ipaddr := range listoftargetips {
+		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
+			iplist, err := expandCidr(prefix)
+			if err == nil {
+				if options.Verbose == true{
+					fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
+				}
+				//checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
+				for _, ipp := range iplist {
+					if ipp == ipaddr {
+						fmt.Println(ipaddr)
+						break
+					}
+				}
+
+			} 
 		}
 	}
 }
@@ -61,7 +82,6 @@ func main() {
 	var wg sync.WaitGroup
 
 	if options.PrefixFile != "" {
-			
 
 		prefixfilestream, _ := ioutil.ReadFile(options.PrefixFile)
 		prefixcontent := string(prefixfilestream)
@@ -80,22 +100,10 @@ func main() {
 		}
 		
 		for _, prefix := range listofprefixes {
-			for _, ipaddr := range listoftargetips {
-				
-				if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
-					iplist, err := expandCidr(prefix)
-					if err == nil {
-						if options.Verbose == true{
-							fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
-						}
-						wg.Add(1)
-						go checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
-					} 
-				}
-			}
-		}
-		
+			wg.Add(1)
+			go checklist(listoftargetips,prefix,wg, options)
 
+		}
 		wg.Wait()
 	} 
 
