@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
+	prefixcheck "github.com/dogasantos/prefixcheck/pkg/runner"
 	"github.com/xgfone/netaddr"
-	"github.com/dogasantos/prefixcheck/pkg/runner"
 )
 
 type Options struct {
@@ -59,7 +59,6 @@ func main() {
 		for _, prefix := range listofprefixes {
 			wg.Add(1)
 			go prefixcheck.Checklist(listoftargetips,prefix,wg, options.Verbose)
-
 		}
 		wg.Wait()
 	} 
