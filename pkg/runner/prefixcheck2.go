@@ -8,19 +8,6 @@ import (
 	"github.com/projectdiscovery/mapcidr"
 )
 
-/*
-func sliceContainsElement(slice []string, element string) bool {
-	retval := false
-	for _, e := range slice {
-		if e == element {
-			retval = true
-		}
-	}
-	return retval
-}
-*/
-
-
 func expandCidr(prefix string) ([]string, error) {
 	iplist, err := mapcidr.IPAddresses(prefix)
 	return iplist, err
@@ -35,8 +22,8 @@ func checkCidrAddress(verbose bool, singleip string, iplist []string, wg * sync.
 	}
 }
 
-func Checklist(listoftargetips []string,prefix string, wg sync.WaitGroup, verbose bool) { 
-	defer wg.Done()
+func Checklist(listoftargetips []string,prefix string, wg * sync.WaitGroup, verbose bool) { 
+	 
 	for _, ipaddr := range listoftargetips {
 		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
 			iplist, err := expandCidr(prefix)
@@ -55,4 +42,5 @@ func Checklist(listoftargetips []string,prefix string, wg sync.WaitGroup, verbos
 			} 
 		}
 	}
+	wg.Done()
 }
