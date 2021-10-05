@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"sync"
+	"github.com/dogasantos/prefixcheck/pkg/runner"
 )
 
 type Options struct {
