@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	prefixcheck "github.com/dogasantos/prefixcheck/pkg/runner"
-	"github.com/xgfone/netaddr"
 )
 
 type Options struct {
@@ -60,32 +59,12 @@ func main() {
 			wg.Add(1)
 			go prefixcheck.Checklist(listoftargetips, prefix, &wg, options.Verbose)
 		}
+		
 		wg.Wait()
 	} 
 
 	if options.IpAddress != "" {
-		ipv4 := netaddr.MustNewIPAddress(options.IpAddress)
-		if ipv4.IsIPv4() {
-			if ipv4.IsLoopback() {
-				fmt.Printf("%s:loopback\n",options.IpAddress)
-			} else {
-				if ipv4.IsReserved() {
-					fmt.Printf("%s:reserved\n",options.IpAddress)
-				} else {
-
-					if ipv4.IsPrivate() {
-						fmt.Printf("%s:private\n",options.IpAddress)
-					} else {
-						fmt.Printf("%s:public\n",options.IpAddress)
-					}
-				}
-			}
-			
-		} else {
-			fmt.Printf("%s:invalid\n",options.IpAddress)
-		}
-
-
+		fmt.Println(prefixcheck.CheckIp(options.IpAddress))
 	}
 }
 

@@ -2,44 +2,56 @@ package prefixcheck
 
 import (
 	"fmt"
+	"net"
 	"strings"
 	"sync"
 
-	"github.com/projectdiscovery/mapcidr"
+	"github.com/xgfone/netaddr"
 )
 
-func expandCidr(prefix string) ([]string, error) {
-	iplist, err := mapcidr.IPAddresses(prefix)
-	return iplist, err
-}
 
-func checkCidrAddress(verbose bool, singleip string, iplist []string, wg * sync.WaitGroup)  {
-	for _, ipp := range iplist {
-		if ipp == singleip {
-			fmt.Println(singleip)
-			break
-		}
-	}
-}
+func CheckIp(ipaddr string) string {
+	var result string
+	ipv4 := netaddr.MustNewIPAddress(ipaddr)
+		if ipv4.IsIPv4() {
+			if ipv4.IsLoopback() {
+				result = fmt.Sprintf("%s:loopback",ipaddr)
+			} else {
+				if ipv4.IsReserved() {
+					result = fmt.Sprintf("%s:reserved",ipaddr)
+				} else {
 
-func Checklist(listoftargetips []string,prefix string, wg * sync.WaitGroup, verbose bool) { 
-	 
-	for _, ipaddr := range listoftargetips {
-		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
-			iplist, err := expandCidr(prefix)
-			if err == nil {
-				if verbose == true{
-					fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
-				}
-				//checkCidrAddress(options.Verbose, ipaddr, iplist, &wg)
-				for _, ipp := range iplist {
-					if ipp == ipaddr {
-						fmt.Println(ipaddr)
-						break
+					if ipv4.IsPrivate() {
+						result = fmt.Sprintf("%s:private",ipaddr)
+					} else {
+						result = fmt.Sprintf("%s:public",ipaddr)
 					}
 				}
-
-			} 
+			}
+			
+		} else {
+			result = fmt.Sprintf("%s:invalid",ipaddr)
+		}
+	
+	return result
+}
+func Checklist(listoftargetips []string,prefix string, wg * sync.WaitGroup, verbose bool) {
+	for _, ipaddr := range listoftargetips {
+		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
+			_, cidrAddr, _ := net.ParseCIDR(prefix)
+			if verbose == true{
+				fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
+			}
+			// testa se o ip eh valido/invalido/publico/
+			if len(ipaddr) > 4 {
+				result:=CheckIp(ipaddr)
+				if strings.Contains("public",strings.Split(result, ":")[1]) {
+					iptest := net.ParseIP(ipaddr)
+					if cidrAddr.Contains(iptest) == true {
+						fmt.Println(ipaddr)
+					}
+				}
+			}
 		}
 	}
 	wg.Done()
