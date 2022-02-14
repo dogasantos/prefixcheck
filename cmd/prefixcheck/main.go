@@ -56,16 +56,15 @@ func main() {
 			fmt.Printf("[*] Target ip address loaded: %d \n",len(listoftargetips))
 		}
 
-		if options.Mode == "ip" { 
-			
+		if options.Mode == "ip" {
 			for _, prefix := range listofprefixes {
 				wg.Add(1)
 				go prefixcheck.CheckForIp(listoftargetips, prefix, &wg, options.Verbose)
 			}
 			wg.Wait()
 			return
-		
 		}
+
 		if options.Mode == "cidr" { 
 			for _, prefix := range listofprefixes {
 				wg.Add(1)
