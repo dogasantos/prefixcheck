@@ -9,7 +9,6 @@ import (
 	"github.com/xgfone/netaddr"
 )
 
-
 func CheckIp(ipaddr string) string {
 	var result string
 	ipv4 := netaddr.MustNewIPAddress(ipaddr)
@@ -35,13 +34,14 @@ func CheckIp(ipaddr string) string {
 	
 	return result
 }
-func Checklist(listoftargetips []string,prefix string, wg * sync.WaitGroup, verbose bool) {
+func CheckForIp(listoftargetips []string,prefix string, wg * sync.WaitGroup, verbose bool) {
 	for _, ipaddr := range listoftargetips {
 		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
 			_, cidrAddr, _ := net.ParseCIDR(prefix)
 			if verbose == true{
 				fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
 			}
+			
 			// testa se o ip eh valido/invalido/publico/
 			if len(ipaddr) > 4 {
 				result:=CheckIp(ipaddr)
@@ -52,6 +52,22 @@ func Checklist(listoftargetips []string,prefix string, wg * sync.WaitGroup, verb
 					}
 				}
 			}
+		}
+	}
+	wg.Done()
+}
+
+
+
+
+func CheckForCidr(listoftargetips []string,prefix string, wg * sync.WaitGroup, verbose bool) {
+	for _, ipaddr := range listoftargetips {
+		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
+			_, cidrAddr, _ := net.ParseCIDR(prefix)
+			if verbose == true{
+				fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
+			}
+			fmt.Println(prefix)
 		}
 	}
 	wg.Done()
