@@ -38,7 +38,7 @@ func CheckForIp(listoftargetips []string,prefix string, wg * sync.WaitGroup, ver
 	for _, ipaddr := range listoftargetips {
 		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
 			_, cidrAddr, _ := net.ParseCIDR(prefix)
-			if verbose == true{
+			if verbose == true {
 				fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
 			}
 
@@ -63,11 +63,8 @@ func CheckForCidr(listoftargetips []string,prefix string, wg * sync.WaitGroup, v
 			//_, cidrAddr, _ = net.ParseCIDR(prefix)
 			if verbose == true {
 				fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
-				
 			}
-			else {
-				fmt.Printf("%s,%s\n",ipaddr,prefix)
-			}
+			fmt.Println("%s\n",prefix)
 		}
 	}
 	wg.Done()
