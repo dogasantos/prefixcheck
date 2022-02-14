@@ -57,9 +57,6 @@ func CheckForIp(listoftargetips []string,prefix string, wg * sync.WaitGroup, ver
 	wg.Done()
 }
 
-
-
-
 func CheckForCidr(listoftargetips []string,prefix string, wg * sync.WaitGroup, verbose bool) {
 	for _, ipaddr := range listoftargetips {
 		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {

@@ -37,7 +37,7 @@ func main() {
 	var wg sync.WaitGroup
 	options := parseOptions()
 	if options.Version {
-		fmt.Println("v0.2")
+		fmt.Println("v0.3")
 	}
 	
 	if options.PrefixFile != "" {
