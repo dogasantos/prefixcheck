@@ -61,10 +61,26 @@ func CheckForCidr(listoftargetips []string,prefix string, wg * sync.WaitGroup, v
 	for _, ipaddr := range listoftargetips {
 		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
 			//_, cidrAddr, _ = net.ParseCIDR(prefix)
-			if verbose == true{
+			if verbose == true {
+				fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
+				
+			}
+			else {
+				fmt.Printf("%s,%s\n",ipaddr,prefix)
+			}
+		}
+	}
+	wg.Done()
+}
+
+func CheckForBoth(listoftargetips []string,prefix string, wg * sync.WaitGroup, verbose bool) {
+	for _, ipaddr := range listoftargetips {
+		if strings.Split(ipaddr, ".")[0] == strings.Split(prefix, ".")[0] {
+			//_, cidrAddr, _ = net.ParseCIDR(prefix)
+			if verbose == true {
 				fmt.Printf("[*] Checking pair: %s and %s\n",ipaddr,prefix)
 			}
-			fmt.Println(prefix)
+			fmt.Printf("%s,%s\n",ipaddr,prefix)
 		}
 	}
 	wg.Done()

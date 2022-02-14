@@ -27,7 +27,7 @@ func parseOptions() *Options {
 	flag.StringVar(&options.IpAddress, 			"r", "", "Check if provided ip address is reserved/private or public (v4)")
 	flag.BoolVar(&options.Version, 				"i", false, "Version info")
 	flag.BoolVar(&options.Verbose, 				"v", false, "Verbose mode for debug purposes")
-    flag.StringVar(&options.Mode, 				"m", "ip", "Mode (ip|cidr)")
+    flag.StringVar(&options.Mode, 				"m", "ip", "Mode (ip|cidr|both)")
 
 	flag.Parse()
 	return options
@@ -69,6 +69,15 @@ func main() {
 			for _, prefix := range listofprefixes {
 				wg.Add(1)
 				go prefixcheck.CheckForCidr(listoftargetips, prefix, &wg, options.Verbose)
+			}
+			wg.Wait()
+			return
+		}
+
+		if options.Mode == "both" { 
+			for _, prefix := range listofprefixes {
+				wg.Add(1)
+				go prefixcheck.CheckForBoth(listoftargetips, prefix, &wg, options.Verbose)
 			}
 			wg.Wait()
 			return
