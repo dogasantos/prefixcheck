@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/xgfone/netaddr"
+	"github.com/xgfone/go-netaddr"
 )
 
 func CheckIp(ipaddr string) string {
